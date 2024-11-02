@@ -1,0 +1,13 @@
+{
+  "parent" : "base",
+  "properties": {
+    "base:color": "0xFDFF76",
+    "base:durability": 32,
+    "mining:level": 0,
+    "mining:speed": 12.0,
+    "attack:damage": 0.0,
+    "attack:speed": 0.0,
+    "tool_rod:durability_multiplier": 0.8,
+    "tool_rod:speed_multiplier": 1.5
+  }
+}

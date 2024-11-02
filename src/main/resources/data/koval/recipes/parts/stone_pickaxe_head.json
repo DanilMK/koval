@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": {
+      "item": "minecraft:flint"
+    },
+    "X": {
+      "tag": "minecraft:stone_crafting_materials"
+    }
+  },
+  "pattern": [
+    "XXX",
+   " # ",
+   " # "
+  ],
+  "result": {
+    "item": "koval:stone_pickaxe_head"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "net.smok.mixin.client",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "LoaderMixin",
+    "ModelMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+	}
+}

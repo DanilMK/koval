@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "minecraft:block/oak_planks",
+    "east": "koval:block/assembler_table_side",
+    "north": "koval:block/assembler_table_front",
+    "particle": "koval:block/assembler_table_front",
+    "south": "koval:block/assembler_table_side",
+    "up": "koval:block/assembler_table_top",
+    "west": "koval:block/assembler_table_front"
+  }
+}

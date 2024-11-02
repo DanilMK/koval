@@ -1,0 +1,11 @@
+{
+  "parent" : "base_mining_material",
+  "properties": {
+    "base:color": "0x33EBCB",
+    "base:durability": 1561,
+    "mining:level": 3,
+    "mining:speed": 8.0,
+    "attack:damage": 3.0,
+    "attack:speed": 1.0
+  }
+}

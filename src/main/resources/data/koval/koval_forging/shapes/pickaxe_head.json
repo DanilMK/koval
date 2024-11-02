@@ -1,0 +1,17 @@
+{
+  "parent": "koval:mining_head",
+  "parts": {
+    "koval:wood": "#material_#shape",
+    "koval:stone": "#material_#shape",
+    "koval:gold": "#material_#shape",
+    "koval:iron": "#material_#shape",
+    "koval:netherite": "#material_#shape",
+    "koval:diamond": "#material_#shape"
+  },
+  "properties":{
+    "attack:damage": 1,
+    "attack:speed": 0,
+    "mining:speed": 0,
+    "mining:effective_blocks": "mineable/pickaxe"
+  }
+}

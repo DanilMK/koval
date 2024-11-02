@@ -1,0 +1,59 @@
+{
+  "block.koval.assembler_table": "Tool Assembler Table",
+
+  "item.koval.wood_pickaxe_head": "Wood Pickaxe Head",
+  "item.koval.stone_pickaxe_head": "Stone Pickaxe Head",
+  "item.koval.iron_pickaxe_head": "Iron Pickaxe Head",
+  "item.koval.diamond_pickaxe_head": "Diamond Pickaxe Head",
+  "item.koval.gold_pickaxe_head": "Golden Pickaxe Head",
+  "item.koval.netherite_pickaxe_head": "Netherite Pickaxe Head",
+
+  "item.koval.wood_axe_head": "Wood Axe Head",
+  "item.koval.stone_axe_head": "Stone Axe Head",
+  "item.koval.iron_axe_head": "Iron Axe Head",
+  "item.koval.diamond_axe_head": "Diamond Axe Head",
+  "item.koval.gold_axe_head": "Golden Axe Head",
+  "item.koval.netherite_axe_head": "Netherite Axe Head",
+
+  "item.koval.wood_hoe_head": "Wood Hoe Head",
+  "item.koval.stone_hoe_head": "Stone Hoe Head",
+  "item.koval.iron_hoe_head": "Iron Hoe Head",
+  "item.koval.diamond_hoe_head": "Diamond Hoe Head",
+  "item.koval.gold_hoe_head": "Golden Hoe Head",
+  "item.koval.netherite_hoe_head": "Netherite Hoe Head",
+
+  "item.koval.wood_shovel_head": "Wood Shovel Head",
+  "item.koval.stone_shovel_head": "Stone Shovel Head",
+  "item.koval.iron_shovel_head": "Iron Shovel Head",
+  "item.koval.diamond_shovel_head": "Diamond Shovel Head",
+  "item.koval.gold_shovel_head": "Golden Shovel Head",
+  "item.koval.netherite_shovel_head": "Netherite Shovel Head",
+
+  "item.koval.stone_tool_rod": "Stone Tool Rod",
+  "item.koval.iron_tool_rod": "Iron Tool Rod",
+  "item.koval.gold_tool_rod": "Golden Tool Rod",
+  "item.koval.netherite_tool_rod": "Netherite Tool Rod",
+
+  "item.koval.mining_tool": "Mining tool",
+
+  "koval.parameter.mining.speed": "Mining speed",
+  "koval.parameter.mining.level": "Mining level",
+  "koval.parameter.mining.effective_blocks": "Mining blocks",
+  "koval.parameter.attack.damage": "Attack damage",
+  "koval.parameter.attack.speed": "Attack speed",
+  "koval.parameter.base.durability": "Durability",
+
+  "koval.function.number.add": "Add %s to %s",
+  "koval.function.number.multiply": "Multiply %s by %s",
+  "koval.function.number.subtract": "Subtract %s from %s",
+  "koval.function.number.divide": "Divide %s by %s",
+  "koval.function.boolean.and": "%s and %s",
+  "koval.function.boolean.or": "%s or %s",
+  "koval.function.boolean.xor": "%s xor %s",
+  "koval.function.boolean.not": "Not %s",
+  "koval.function.block.is_in": "%s",
+  "koval.function.item.is_in": "%s",
+
+  "container.assemble_table": "Assemble Table",
+  "itemGroup.koval.parts": "Parts"
+}

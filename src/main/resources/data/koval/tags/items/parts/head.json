@@ -1,0 +1,28 @@
+{
+  "values": [
+    "koval:diamond_pickaxe_head",
+    "koval:gold_pickaxe_head",
+    "koval:iron_pickaxe_head",
+    "koval:netherite_pickaxe_head",
+    "koval:stone_pickaxe_head",
+    "koval:wood_pickaxe_head",
+    "koval:diamond_axe_head",
+    "koval:gold_axe_head",
+    "koval:iron_axe_head",
+    "koval:netherite_axe_head",
+    "koval:stone_axe_head",
+    "koval:wood_axe_head",
+    "koval:diamond_hoe_head",
+    "koval:gold_hoe_head",
+    "koval:iron_hoe_head",
+    "koval:netherite_hoe_head",
+    "koval:stone_hoe_head",
+    "koval:wood_hoe_head",
+    "koval:diamond_shovel_head",
+    "koval:gold_shovel_head",
+    "koval:iron_shovel_head",
+    "koval:netherite_shovel_head",
+    "koval:stone_shovel_head",
+    "koval:wood_shovel_head"
+  ]
+}

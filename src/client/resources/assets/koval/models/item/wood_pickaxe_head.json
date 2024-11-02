@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "koval:item/wood_pickaxe_head"
+  }
+}

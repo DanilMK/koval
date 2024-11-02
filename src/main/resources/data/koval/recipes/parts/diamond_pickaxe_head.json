@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": {
+      "item": "minecraft:flint"
+    },
+    "X": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "pattern": [
+    "XXX",
+   " # ",
+   " # "
+  ],
+  "result": {
+    "item": "koval:diamond_pickaxe_head"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smithing",
+  "addition": {
+    "item": "minecraft:netherite_ingot"
+  },
+  "base": {
+    "item": "koval:diamond_hoe_head"
+  },
+  "result": {
+    "item": "koval:netherite_hoe_head"
+  }
+}

@@ -2,68 +2,61 @@ package net.smok.koval;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
 import net.smok.Debug;
 import net.smok.Values;
-import net.smok.koval.forging.ConditionGroup;
-import net.smok.koval.forging.ParametersGroup;
+import net.smok.koval.forging.*;
 import net.smok.utility.SavableObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
 public class Shape implements SavableObject<Shape> {
 
 
-    public static final Shape BASE_SHAPE = new Shape(Properties.EMPTY, new ParametersGroup(Map.of()), Map.of(), ConditionGroup.EMPTY, null);
+    public static final Shape BASE_SHAPE = new Shape(Properties.EMPTY, new ParametersGroup(Map.of()), Map.of(), List.of());
 
     @NotNull private final Properties properties;
     @NotNull private final ParametersGroup parameters;
     @NotNull private final Map<String, String> parts;
-    @NotNull private final ConditionGroup conditions;
-    @Nullable private final Item constructItem;
+    @NotNull private final List<AssembleRecipe> recipes;
 
     public Shape(@NotNull Properties properties, @NotNull ParametersGroup parameters, @NotNull Map<String, String> parts,
-                 @NotNull ConditionGroup conditions, @Nullable Item constructItem) {
+                 @NotNull List<AssembleRecipe> recipes) {
         this.properties = properties;
         this.parameters = parameters;
-        this.constructItem = constructItem;
         this.parts = parts;
-        this.conditions = conditions;
+        this.recipes = recipes;
     }
 
     @Override
     public Shape createChild(@NotNull JsonObject json) {
-        Properties propertiesChild = properties.createChild(json.getAsJsonObject(Values.JsonKeys.PROPERTIES));
-        ParametersGroup parametersChild = parameters.createChild(json.getAsJsonObject(Values.JsonKeys.PARAMETERS));
-        ConditionGroup conditionsChild = conditions.createChild(json.getAsJsonObject("conditions"));
+        Properties propertiesChild = properties.createChild(json.getAsJsonObject(Values.Json.PROPERTIES));
+        ParametersGroup parametersChild = parameters.createChild(json.getAsJsonObject(Values.Json.PARAMETERS));
 
         return new Shape(
                 propertiesChild,
                 parametersChild,
-                parseItems(json.get(Values.JsonKeys.IDS), parts),
-                conditionsChild,
-                JsonHelper.getItem(json, "construct_item", constructItem)
-        );
-    }
-
-    public @Nullable Item getConstructItem() {
-        return constructItem;
+                parseItems(json.get(Values.Json.PARTS), parts),
+                parseRecipes(json.get(Values.Json.RECIPE), recipes));
     }
 
     public @NotNull ParametersGroup getParameters() {
         return parameters;
     }
 
-    public @NotNull ConditionGroup getConditions() {
-        return conditions;
+    public @Nullable Item testRecipe(ParameterPlace place) {
+        for (AssembleRecipe recipe : recipes) if (recipe.test(place)) return recipe.result();
+        return null;
     }
 
     public void foreachParts(Identifier shapeId, BiConsumer<Material, Identifier> action) {
@@ -106,18 +99,46 @@ public class Shape implements SavableObject<Shape> {
         return parts;
     }
 
+    public static List<AssembleRecipe> parseRecipes(JsonElement json, List<AssembleRecipe> baseList) {
+        List<AssembleRecipe> list = new ArrayList<>(baseList);
+        if (json == null) return list;
+
+
+        if (json.isJsonArray()) {
+            for (JsonElement element : json.getAsJsonArray()) {
+                try {
+                    AssembleRecipe recipe = AssembleRecipe.fromJson(element);
+                    list.add(recipe);
+                } catch (JsonParseException e) {
+                    Debug.warn("Recipe will be skip. ");
+                    Debug.err(e.toString());
+                }
+            }
+        } else {
+
+            try {
+                AssembleRecipe recipe = AssembleRecipe.fromJson(json);
+                list.add(recipe);
+            } catch (JsonParseException e) {
+                Debug.warn("Recipe will be skip. ");
+                Debug.err(e.toString());
+            }
+        }
+
+        return list;
+    }
+
     @Override
     public String toString() {
         return "Shape {" +
                 " properties=" + properties +
                 ", parameters=" + parameters +
                 ", parts=[" + String.join(", ", parts.entrySet().stream().map(entry -> entry.getKey()+": "+entry.getValue()).toList()) + "]" +
-                ", conditions=" + conditions +
-                ", constructItem=" + constructItem +
+                ", conditions=" + recipes +
                 '}';
     }
 
-    public Properties getProperties() {
+    public @NotNull Properties getProperties() {
         return properties;
     }
 }

@@ -1,13 +1,10 @@
 {
-  "parent" : "base_mining_material",
   "properties": {
+    "attack:damage": 4.0,
+    "attack:speed": 1.0,
     "base:color": "0x867B86",
     "base:durability": 2031,
     "mining:level": 4,
-    "mining:speed": 9.0,
-    "attack:damage": 4.0,
-    "attack:speed": 1.0,
-    "tool_rod:durability_multiplier": 3.0,
-    "tool_rod:speed_multiplier": 1.0
+    "mining:speed": 9.0
   }
 }

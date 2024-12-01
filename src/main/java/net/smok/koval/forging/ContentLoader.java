@@ -31,7 +31,7 @@ public class ContentLoader implements SimpleSynchronousResourceReloadListener {
 
     @Override
     public void reload(ResourceManager manager) {
-        KovalRegistry.clearRegistrations();
+
 
 //        Debug.log("Load parts... ");
         HashMap<Identifier, JsonObject> materialsJson = readResources(manager, "koval_forging/materials");
@@ -51,7 +51,7 @@ public class ContentLoader implements SimpleSynchronousResourceReloadListener {
         for (Identifier ownId : sortedMaterials) {
             Identifier parentId = getParentId(materialsJson.get(ownId));
             Material parent = KovalRegistry.MATERIALS.get(parentId);
-            KovalRegistry.MATERIALS.register(ownId, parent.createChild(materialsJson.get(ownId)));
+            Registry.register(KovalRegistry.MATERIALS, ownId, parent.createChild(materialsJson.get(ownId)));
         }
 
         HashMap<Identifier, Shape> registeredShapes = new HashMap<>();
@@ -60,21 +60,22 @@ public class ContentLoader implements SimpleSynchronousResourceReloadListener {
             Shape parent = KovalRegistry.SHAPES.get(parentId);
             //Debug.log("Create "+ownId+" parameters child: "+shapesJson.get(ownId).get(Values.JsonKeys.PARAMETERS));
 
-            Shape child = KovalRegistry.SHAPES.register(ownId, parent.createChild(shapesJson.get(ownId)));
+            Shape child = Registry.register(KovalRegistry.SHAPES, ownId, parent.createChild(shapesJson.get(ownId)));
             registeredShapes.put(ownId, child);
         }
 
         registeredShapes.forEach((identifier, shape) ->
                 shape.foreachParts(identifier, (material, itemId) -> {
                     if (Registry.ITEM.containsId(itemId)) {
-                        KovalRegistry.PARTS.register(itemId, new Part(shape, material));
+                        Part part = new Part(shape, material);
+                        Registry.register(KovalRegistry.PARTS, itemId, part);
                     }
                 }));
 
         Debug.log(MessageFormat.format("Successful load \n   Materials: [{0}]\n   Shapes: [{1}]\n   Parts: [{2}]",
-                String.join(", ", KovalRegistry.MATERIALS.getAll().entrySet().stream().map(entry -> entry.getKey().toString()+"= "+entry.getValue()).toList()),
-                String.join(", ", KovalRegistry.SHAPES.getAll().entrySet().stream().map(entry -> entry.getKey().toString()+"= "+entry.getValue()).toList()),
-                String.join(", ", KovalRegistry.PARTS.getAll().entrySet().stream().map(entry -> entry.getKey().toString()+"= "+entry.getValue()).toList())));
+                String.join(", ", KovalRegistry.MATERIALS.getEntrySet().stream().map(entry -> entry.getKey().toString()+"= "+entry.getValue()).toList()),
+                String.join(", ", KovalRegistry.SHAPES.getEntrySet().stream().map(entry -> entry.getKey().toString()+"= "+entry.getValue()).toList()),
+                String.join(", ", KovalRegistry.PARTS.getEntrySet().stream().map(entry -> entry.getKey().toString()+"= "+entry.getValue()).toList())));
 
     }
 

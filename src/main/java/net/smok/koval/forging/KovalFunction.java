@@ -1,7 +1,6 @@
 package net.smok.koval.forging;
 
-import net.smok.koval.AbstractParameter;
-import net.smok.koval.ActionContext;
+import java.util.Optional;
 
 public abstract class KovalFunction<R> {
 
@@ -22,7 +21,7 @@ public abstract class KovalFunction<R> {
         return parametersTypes;
     }
 
-    public abstract R apply(ActionContext context, AbstractParameter[] parameters);
+    public abstract Optional<R> apply(ParameterPlace context, AbstractParameter<?>[] parameters);
 
     public Class<R> returnType() {
         return returnType;
@@ -36,6 +35,7 @@ public abstract class KovalFunction<R> {
         canSumResult = b;
         return this;
     }
+
 
 
 }

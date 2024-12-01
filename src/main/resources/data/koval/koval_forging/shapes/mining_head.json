@@ -1,49 +1,54 @@
 {
-  "parent": "base",
-  "construct_item": "koval:mining_tool",
-  "properties":{
-    "attack:damage": 6,
-    "attack:speed": -3.2,
-    "mining:speed": 0,
-    "mining:effective_blocks": "mineable/axe"
-  },
-  "conditions": {
-    "logic": "or",
-    "conditions":
-    {
-      "[0,-1]": {
-        "type": "logic:is_in",
-        "value": "koval:parts/tool_rod"
-      }
-    }
-
-  },
   "parameters": {
-    "mining:level": "#material",
-    "mining:speed": {
+    "attack:damage": {
       "function_id": "number:add",
       "parameters": [
-        "#material", "#shape"
+        "#material",
+        "#shape"
       ]
     },
     "attack:speed": {
       "function_id": "number:add",
       "parameters": [
-        "#material", "#shape"
-      ]
-    },
-    "attack:damage": {
-      "function_id": "number:add",
-      "parameters": [
-        "#material", "#shape"
+        "#material",
+        "#shape"
       ]
     },
     "base:durability": "#material",
     "mining:effective_blocks": {
-      "function_id": "block:is_in",
+      "function_id": "block:state_is_in",
       "parameters": [
+        {
+          "function_id": "action:target_block_state",
+          "parameters": []
+        },
+        "#shape"
+      ]
+    },
+    "mining:level": "#material",
+    "mining:speed": {
+      "function_id": "number:add",
+      "parameters": [
+        "#material",
         "#shape"
       ]
     }
-  }
+  },
+  "properties": {
+    "attack:damage": 6,
+    "attack:speed": -3.2,
+    "mining:effective_blocks": "mineable/axe",
+    "mining:speed": 0
+  },
+  "recipe": [
+    {
+      "parameter": {
+        "function_id": "assembler:has_any_item",
+        "parameters": [
+          "koval:parts/tool_rod"
+        ]
+      },
+      "result": "koval:mining_tool"
+    }
+  ]
 }

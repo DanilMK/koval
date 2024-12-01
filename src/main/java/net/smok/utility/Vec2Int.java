@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.zip.ZipEntry;
 
 public record Vec2Int(int x, int y) {
@@ -34,6 +35,32 @@ public record Vec2Int(int x, int y) {
         return MessageFormat.format("[{0},{1}]", x, y);
     }
 
+    public String arrow() {
+        if (y == 0) {
+            switch (x) {
+                case 0: return "+";
+                case 1: return "→";
+                case -1: return "←";
+            }
+        }
+        else if (y == 1) {
+            switch (x) {
+                case 0: return "↑";
+                case 1: return "↗";
+                case -1: return "↖";
+            }
+        }
+        else if (y == -1) {
+            switch (x) {
+                case 0: return "↓";
+                case 1: return "↘";
+                case -1: return "↙";
+            }
+        }
+
+        return toString();
+    }
+
     @Contract(pure = true)
     public @NotNull String toStringFormat(@NotNull String format) {
         return MessageFormat.format(format, x, y);
@@ -51,4 +78,5 @@ public record Vec2Int(int x, int y) {
             return ZERO;
         }
     }
+
 }

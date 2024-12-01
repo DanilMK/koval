@@ -18,7 +18,7 @@
 			"net.smok.KovalClient"
 		],
 		"fabric-datagen": [
-			"net.smok.koval.KovalDataGenerator"
+          "net.smok.koval.data.KovalDataGenerator"
 		]
 	},
 	"mixins": [

@@ -1,50 +1,37 @@
 {
-  "parent": "base",
-  "parts": {
-    "koval:bone": "minecraft:bone",
-    "koval:wood": "minecraft:stick",
-    "koval:stone": "koval:#material_#shape",
-    "koval:gold": "koval:#material_#shape",
-    "koval:iron": "koval:#material_#shape"
-  },
-  "condition_group": {
-    "logic": "or",
-    "conditions":
-    {
-      "[0,-1]": {
-        "type": "logic:is_in",
-        "value": "koval:parts/head"
-      }
-    }
-  },
   "parameters": {
-    "mining:speed": {
-      "function_id": "number:multiply",
-      "parameters": [
-        {
-          "id": "tool_rod:speed_multiplier",
-          "parameter": "#material"
-        },
-        {
-          "id": "mining:speed",
-          "x": 0,
-          "y": 1
-        }
-      ]
-    },
     "base:durability": {
       "function_id": "number:multiply",
       "parameters": [
         {
-          "id": "tool_rod:durability_multiplier",
-          "parameter": "#material"
-        },
-        {
-          "id": "base:durability",
           "x": 0,
           "y": 1
+        },
+        {
+          "id": "tool_rod:durability_multiplier",
+          "parameter": "#material"
+        }
+      ]
+    },
+    "mining:speed": {
+      "function_id": "number:multiply",
+      "parameters": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "id": "tool_rod:speed_multiplier",
+          "parameter": "#material"
         }
       ]
     }
+  },
+  "parts": {
+    "koval:bone": "minecraft:bone",
+    "koval:gold": "koval:#material_#shape",
+    "koval:iron": "koval:#material_#shape",
+    "koval:stone": "koval:#material_#shape",
+    "koval:wood": "minecraft:stick"
   }
 }

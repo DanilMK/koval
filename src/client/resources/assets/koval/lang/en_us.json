@@ -43,6 +43,26 @@
   "koval.parameter.attack.speed": "Attack speed",
   "koval.parameter.base.durability": "Durability",
 
+  "koval.parameter.mining.level.0": "Wood",
+  "koval.parameter.mining.level.1": "Stone",
+  "koval.parameter.mining.level.2": "Iron",
+  "koval.parameter.mining.level.3": "Diamond",
+  "koval.parameter.mining.level.4": "Netherite",
+  "koval.parameter.mining.effective_blocks.mineable.axe": "As Axe",
+  "koval.parameter.mining.effective_blocks.mineable.pickaxe": "As Pickaxe",
+  "koval.parameter.mining.effective_blocks.mineable.hoe": "As Hoe",
+  "koval.parameter.mining.effective_blocks.mineable.shovel": "As Shovel",
+
+  "koval.parameter.base.arrow.[-1,-1]": "↙",
+  "koval.parameter.base.arrow.[-1,0]": "←",
+  "koval.parameter.base.arrow.[-1,1]": "↖",
+  "koval.parameter.base.arrow.[0,-1]": "↓",
+  "koval.parameter.base.arrow.[0,0]": "+",
+  "koval.parameter.base.arrow.[0,1]": "↑",
+  "koval.parameter.base.arrow.[1,-1]": "↘",
+  "koval.parameter.base.arrow.[1,0]": "→",
+  "koval.parameter.base.arrow.[1,1]": "↗",
+
   "koval.function.number.add": "Add %s to %s",
   "koval.function.number.multiply": "Multiply %s by %s",
   "koval.function.number.subtract": "Subtract %s from %s",
@@ -53,6 +73,7 @@
   "koval.function.boolean.not": "Not %s",
   "koval.function.block.is_in": "%s",
   "koval.function.item.is_in": "%s",
+  "koval.function.unknown": "Unknown function",
 
   "container.assemble_table": "Assemble Table",
   "itemGroup.koval.parts": "Parts"

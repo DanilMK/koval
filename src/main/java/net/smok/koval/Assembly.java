@@ -5,9 +5,12 @@ import net.minecraft.nbt.NbtString;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.smok.Debug;
+import net.smok.koval.forging.AbstractParameter;
+import net.smok.koval.forging.Context;
 import net.smok.utility.Vec2Int;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -50,10 +53,21 @@ public class Assembly {
 
     public static @NotNull NbtCompound itemsMapToNbt(@NotNull Map<Vec2Int, Identifier> map) {
         NbtCompound result = new NbtCompound();
+        Vec2Int min = min(map.keySet());
         for (Map.Entry<Vec2Int, Identifier> entry : map.entrySet()) {
-            result.put(entry.getKey().toString(), NbtString.of(entry.getValue().toString()));
+            result.put(entry.getKey().subtract(min).toString(), NbtString.of(entry.getValue().toString()));
         }
         return result;
+    }
+
+    public static Vec2Int min(Collection<Vec2Int> vectors) {
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        for (Vec2Int vector : vectors) {
+            minX = Math.min(vector.x(), minX);
+            minY = Math.min(vector.y(), minY);
+        }
+        return new Vec2Int(minX, minY);
     }
 
     private static HashMap<Identifier, PartRecord> assemble(Map<Vec2Int, net.smok.koval.Part> parts) {
@@ -64,7 +78,7 @@ public class Assembly {
             Vec2Int pos = entry.getKey();
             net.smok.koval.Part part = entry.getValue();
 
-            for (Map.Entry<Identifier, AbstractParameter> parameterEntry : part.parameters().parameters().entrySet()) {
+            for (Map.Entry<Identifier, AbstractParameter<?>> parameterEntry : part.parameters().parameters().entrySet()) {
                 Identifier id = parameterEntry.getKey();
 
                 ArrayList<Vec2Int> resultList = rawMap.getOrDefault(id, new ArrayList<>());
@@ -82,7 +96,7 @@ public class Assembly {
             Identifier id = entry.getKey();
             Vec2Int pos = entry.getValue().get(entry.getValue().size() - 1);
             net.smok.koval.Part part = parts.get(pos);
-            AbstractParameter parameter = part.parameters().get(id);
+            AbstractParameter<?> parameter = part.parameters().get(id);
 
             resultMap.put(id, new PartRecord(pos, part, parameter));
         }
@@ -113,7 +127,7 @@ public class Assembly {
             addList.add(0, next);
 
             // Add all new pointers
-            AbstractParameter parameter = parts.get(next).parameters().get(id);
+            AbstractParameter<?> parameter = parts.get(next).parameters().get(id);
             if (parameter == null) {
                 Debug.err(MessageFormat.format("(Assembly) Part ({0}) doesn''t contain parameter with id ({1})", parts.get(next), id));
                 continue;
@@ -142,22 +156,25 @@ public class Assembly {
 
 
 
-    public int applyValue(Identifier valueId, int start, Object... params) {
-        return applyObjectValue(valueId, params) instanceof Number number ? (int)number.floatValue() : start;
+    public int applyValue(Identifier valueId, int start, @Nullable Context context) {
+        return applyObjectValue(valueId, Number.class, context).orElse(start).intValue();
     }
 
-    public float applyValue(Identifier valueId, float start, Object... params) {
-        return applyObjectValue(valueId, params) instanceof Number number ? number.floatValue() : start;
+    public float applyValue(Identifier valueId, float start, @Nullable Context context) {
+        return applyObjectValue(valueId, Number.class, context).orElse(start).floatValue();
     }
 
-    public boolean applyValue(Identifier valueId, boolean start, Object... params) {
-        return applyObjectValue(valueId, params) instanceof Boolean b ? b : start;
+    public boolean applyValue(Identifier valueId, boolean start, @Nullable Context context) {
+        return applyObjectValue(valueId, Boolean.class, context).orElse(start);
     }
 
-    public Object applyObjectValue(Identifier identifier, Object... actionParams) {
+    public <T> Optional<T> applyObjectValue(Identifier identifier, Class<T> type, @Nullable Context context) {
         PartRecord record = functions.get(identifier);
+        if (record == null) return Optional.empty();
+        Optional<?> o = record.parameter().get(record.getContext(parts, context, identifier));
 
-        return record == null ? null : record.parameter().get(record.getContext(parts, actionParams));
+        if (o.isPresent() && type.isInstance(o.get())) return Optional.of(type.cast(o.get()));
+        return Optional.empty();
     }
 
 
@@ -165,7 +182,7 @@ public class Assembly {
         functions.forEach((identifier, partRecord) ->
                 tooltip.add(Text.translatable(identifier.toTranslationKey("koval.parameter"))
                 .append(": ")
-                .append(partRecord.parameter.toText(partRecord.getContext(parts, new Object[0])))
+                .append(partRecord.parameter.getText(partRecord.getContext(parts, null, identifier)))
                 .styled(style -> style.withColor(partRecord.part.material().color()))
                 ));
     }
@@ -185,8 +202,8 @@ public class Assembly {
             return Objects.hashCode(pos);
         }
 
-        public ActionContext getContext(Map<Vec2Int, Part> parts, Object[] actionParams) {
-            return new ActionContext(parts::get, part, actionParams, pos);
+        public MovablePlace getContext(Map<Vec2Int, Part> parts, @Nullable Context context, Identifier identifier) {
+            return new MovablePlace(context, parts::get, part, pos, identifier);
         }
     }
 }

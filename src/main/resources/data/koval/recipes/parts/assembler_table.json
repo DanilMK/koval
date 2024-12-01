@@ -1,19 +1,18 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "key": {
-    "C": {
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
       "item": "minecraft:crafting_table"
     },
-    "F": {
+    {
       "item": "minecraft:flint"
     },
-    "L": {
+    {
+      "item": "minecraft:flint"
+    },
+    {
       "tag": "logs"
     }
-  },
-  "pattern": [
-    "FF",
-    "CL"
   ],
   "result": {
     "item": "koval:assembler_table"

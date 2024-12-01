@@ -218,11 +218,11 @@ public class AssemblerScreenHandler extends ScreenHandler {
 
         @Override
         public boolean canTakeItems(PlayerEntity playerEntity) {
-            return table.isAllPartSuitable();
+            return table.isAllPartSuitable() && table.hasResult();
         }
 
         public boolean canTake() {
-            return getStack().isEmpty() || table.isAllPartSuitable();
+            return getStack().isEmpty() || (table.isAllPartSuitable() && table.hasResult());
         }
 
         @Override
@@ -247,7 +247,7 @@ public class AssemblerScreenHandler extends ScreenHandler {
         }
         @Override
         public ItemStack takeStack(int amount) {
-            if (table.isAllPartSuitable()) {
+            if (table.isAllPartSuitable() && table.hasResult()) {
                 ItemStack result = super.takeStack(amount);
                 if (!result.isEmpty()) table.clear();
                 return result;

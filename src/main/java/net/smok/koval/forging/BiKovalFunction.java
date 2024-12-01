@@ -1,30 +1,28 @@
 package net.smok.koval.forging;
 
-import net.smok.koval.AbstractParameter;
-import net.smok.koval.ActionContext;
+import org.apache.commons.lang3.function.TriFunction;
 
-public abstract class BiKovalFunction<T, U, R> extends KovalFunction<R>{
+import java.util.Optional;
+
+public class BiKovalFunction<T, U, R> extends KovalFunction<R>{
 
     private final Class<T> firstType;
     private final Class<U> secondType;
+    private final TriFunction<ParameterPlace, T, U, R> function;
 
-    public BiKovalFunction(Class<T> firstType, Class<U> secondType, Class<R> returnType) {
+    public BiKovalFunction(Class<T> firstType, Class<U> secondType, Class<R> returnType, TriFunction<ParameterPlace, T, U, R> function) {
         super(returnType, firstType, secondType);
         this.firstType = firstType;
         this.secondType = secondType;
+        this.function = function;
     }
 
     @Override
-    public R apply(ActionContext context, AbstractParameter[] parameters) {
-        return apply(context.actionParams(), parameters[0].get(context, firstType), parameters[1].get(context, secondType));
+    public Optional<R> apply(ParameterPlace context, AbstractParameter<?>[] parameters) {
+        Optional<T> first = (Optional<T>) parameters[0].get(context);
+        Optional<U> second = (Optional<U>) parameters[1].get(context);
+        if (first.isEmpty() || second.isEmpty()) return Optional.empty();
+        return Optional.ofNullable(function.apply(context, firstType.cast(first.get()), secondType.cast(second.get())));
     }
 
-    /**
-     *
-     * @param actionParams Parameters invoke method. (E.g. breaking BlockState, usable ItemStack)
-     * @param a First inner parameter.
-     * @param b Second inner parameter.
-     * @return result of function.
-     */
-    public abstract R apply(Object[] actionParams, T a, U b);
 }

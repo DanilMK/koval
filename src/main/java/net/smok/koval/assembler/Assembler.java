@@ -13,9 +13,10 @@ import net.minecraft.util.registry.Registry;
 import net.smok.Debug;
 import net.smok.koval.KovalRegistry;
 import net.smok.Values;
-import net.smok.koval.ActionContext;
+import net.smok.koval.MovablePlace;
 import net.smok.koval.Assembly;
 import net.smok.koval.Part;
+import net.smok.koval.forging.AssemblerContext;
 import net.smok.utility.Vec2Int;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,26 +77,26 @@ public class Assembler implements Inventory {
     }
 
     public boolean isPartSuitable(@NotNull Vec2Int pos) {
-        return isPartSuitable(pos, getPart(pos), getPartItem(pos));
+        return isPartSuitable(pos, getPart(pos));
     }
 
-    public boolean isPartSuitable(@NotNull Vec2Int pos, Part part, ItemStack itemStack) {
+    public boolean isPartSuitable(@NotNull Vec2Int pos, Part part) {
         if (pos.x() < 0 || pos.y() < 0 || pos.x() >= columns || pos.y() >= rows)
             throw new IndexOutOfBoundsException(MessageFormat.format(Values.EXCEPTION_VEC_OUT_OF_BOUNDS, pos, new Vec2Int(0, 0), new Vec2Int(columns, rows)));
 
         if (part == null) return true;
-        boolean test = part.testCondition(pos1 -> getPartItem(pos.add(pos1)));
 
-        ActionContext context = new ActionContext(this::getPart, part, new Object[]{itemStack}, pos);
         boolean canAssemble;
         try {
             canAssemble = part.parameters().parameters().entrySet().stream()
-                    .allMatch(entry -> entry.getValue().canAssemble(context));
+                    .allMatch(entry -> entry.getValue().canAssemble(
+                            new MovablePlace(new AssemblerContext(table), this::getPart, part, pos, entry.getKey())));
         } catch (StackOverflowError e) {
             return false;
         }
 
-        return test && canAssemble;
+
+        return canAssemble;
     }
 
     public boolean isAllPartSuitable() {
@@ -118,16 +119,18 @@ public class Assembler implements Inventory {
     }
 
     private Item constructNewItem() {
+        for (int x = 0; x < columns; x++)
+            for (int y = 0; y < rows; y++) {
+                Vec2Int pos = new Vec2Int(x, y);
+                Part part = getPart(pos);
+                ItemStack partItem = getPartItem(pos);
 
-        for (int i = 1; i < table.size(); i++) {
-            ItemStack stack = table.get(i);
-            if (!stack.isEmpty()) {
-                Identifier id = Registry.ITEM.getId(stack.getItem());
-                Item constructItem = KovalRegistry.PARTS.get(id).shape().getConstructItem();
+                if (part == null || partItem == null) continue;
+                AssemblerContext context = new AssemblerContext(table);
+                Item constructItem = part.testRecipe(new MovablePlace(context, this::getPart, part, pos, Registry.ITEM.getId(partItem.getItem())));
 
                 if (constructItem != null) return constructItem;
             }
-        }
 
         return null;
     }
@@ -227,5 +230,9 @@ public class Assembler implements Inventory {
             parts.add(table.get(i));
         }
         return parts;
+    }
+
+    public boolean hasResult() {
+        return constructNewItem() != null;
     }
 }

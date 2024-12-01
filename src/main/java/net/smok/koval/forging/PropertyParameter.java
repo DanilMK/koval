@@ -1,65 +1,91 @@
 package net.smok.koval.forging;
 
-import net.minecraft.text.Text;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.util.Identifier;
-import net.smok.koval.AbstractParameter;
-import net.smok.koval.ActionContext;
-import net.smok.koval.Part;
-import net.smok.koval.Properties;
+import net.smok.Values;
+import net.smok.koval.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
+import java.util.Optional;
 
-public class PropertyParameter extends AbstractParameter {
+public final class PropertyParameter<T> extends AbstractParameter<T> {
 
-    private final Identifier identifier;
-    private final PropertyType type;
+    private enum PropertyType {
+        MATERIAL, SHAPE;
+    }
+
+    private @Nullable final Identifier identifier;
+    private @NotNull final PropertyType type;
 
 
+    public static PropertyParameter<?> material(Identifier identifier) { return new PropertyParameter<>(identifier, PropertyType.MATERIAL); }
+    public static PropertyParameter<?> shape(Identifier identifier) { return new PropertyParameter<>(identifier, PropertyType.SHAPE); }
+    public static PropertyParameter<?> MATERIAL = new PropertyParameter<>(null, PropertyType.MATERIAL);
+    public static PropertyParameter<?> SHAPE = new PropertyParameter<>(null, PropertyType.SHAPE);
 
-    protected PropertyParameter(Class<?> valueType, Identifier identifier, PropertyType type) {
-        super(valueType);
+    public static PropertyParameter<?> fromString(String typeString) {
+        return switch (typeString.toLowerCase()) {
+            case "#materials", "#material" -> MATERIAL;
+            case "#shapes", "#shape" -> SHAPE;
+            default -> throw Values.Json.exceptionInvalidPropertyType(typeString);
+        };
+    }
+
+    public static PropertyParameter<?> fromString(String typeString, Identifier identifier) {
+        return switch (typeString.toLowerCase()) {
+            case "#materials", "#material" -> material(identifier);
+            case "#shapes", "#shape" -> shape(identifier);
+            default -> throw Values.Json.exceptionInvalidPropertyType(typeString);
+        };
+    }
+
+    private PropertyParameter(@Nullable Identifier identifier, @NotNull PropertyType type) {
         this.identifier = identifier;
         this.type = type;
     }
 
     @Override
-    public Object get(ActionContext context) {
+    public Optional<T> get(ParameterPlace context) {
+        throw Values.Json.exceptionInitializeValue(context.parameterId());
+    }
+
+    @Override
+    public Class<T> getValueType() {
+        throw Values.Json.exceptionInitializeValue(identifier);
+    }
+
+
+
+    @Override
+    public boolean canAssemble(ParameterPlace context) {
+        return false;
+    }
+
+    @Override
+    public JsonElement toJson(Identifier identifier) {
+        if (this.identifier == null || identifier == this.identifier) return new JsonPrimitive("#" + type.toString().toLowerCase());
+        else {JsonObject result = new JsonObject();
+            result.add(Values.Json.PROPERTY_TYPE, new JsonPrimitive("#" + type.toString().toLowerCase()));
+            result.add(Values.Json.ID, new JsonPrimitive(this.identifier.toString()));
+            return result;
+        }
+    }
+
+    @Override
+    public AbstractParameter<?> initialize(Identifier identifier, Shape shape, Material material) throws NullPointerException {
+        Identifier id = this.identifier != null ? this.identifier : identifier;
+
         return switch (type) {
-            case SHAPE -> context.shapeProperties().getAny(identifier, "Shape");
-            case MATERIAL -> context.materialProperty().getAny(identifier, "Material");
+            case SHAPE -> shape.getProperties().getValue(id).clone();
+            case MATERIAL -> material.properties().getValue(id).clone();
         };
     }
 
     @Override
-    public Text toText(ActionContext context) {
-        return toText(context.part());
-    }
-
-    @Override
-    public Text toText(Part part) {
-        Properties properties = type == PropertyType.SHAPE ? part.shape().getProperties() : part.material().getProperties();
-
-        return properties.contains(identifier) ?
-                Text.literal(properties.getAny(identifier, type.name()).toString())
-                : Text.literal("UNKNOWN PROPERTY");
-    }
-
-    @Override
-    public String toString() {
-        return "Property{" + identifier + "=" + type + " as " +valueType.getName() + '}';
-    }
-
-    public enum PropertyType {
-        MATERIAL, SHAPE
-    }
-
-    @Override
-    public boolean canAssemble(ActionContext context) {
-        if (Objects.requireNonNull(type) == PropertyType.MATERIAL) {
-            return context.materialProperty().contains(identifier);
-        } else if (type == PropertyType.SHAPE) {
-            return context.shapeProperties().contains(identifier);
-        }
-        return true;
+    public PropertyParameter<T> clone() {
+        return new PropertyParameter<>(identifier, type);
     }
 }

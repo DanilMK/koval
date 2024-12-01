@@ -4,6 +4,8 @@ import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
 
 public class EmptyToolMaterial implements ToolMaterial {
+    public static EmptyToolMaterial EMPTY = new EmptyToolMaterial();
+
     @Override
     public int getDurability() {
         return 1;

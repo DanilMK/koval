@@ -7,7 +7,7 @@ public abstract class NumberUtils extends Number {
 
     @Override
     public String toString() {
-        return Float.toString(floatValue());
+        return String.format("%.0f", floatValue());
     }
 
     public static final NumberUtils ZERO = new NumberUtils() {

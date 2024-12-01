@@ -1,17 +1,17 @@
 {
   "parent": "koval:mining_head",
   "parts": {
-    "koval:wood": "#material_#shape",
-    "koval:stone": "#material_#shape",
-    "koval:gold": "#material_#shape",
-    "koval:iron": "#material_#shape",
-    "koval:netherite": "#material_#shape",
-    "koval:diamond": "#material_#shape"
+    "koval:diamond": "koval:#material_#shape",
+    "koval:gold": "koval:#material_#shape",
+    "koval:iron": "koval:#material_#shape",
+    "koval:netherite": "koval:#material_#shape",
+    "koval:stone": "koval:#material_#shape",
+    "koval:wood": "koval:#material_#shape"
   },
-  "properties":{
+  "properties": {
     "attack:damage": -2,
     "attack:speed": -3,
-    "mining:speed": 0,
-    "mining:effective_blocks": "mineable/hoe"
+    "mining:effective_blocks": "mineable/hoe",
+    "mining:speed": 0
   }
 }

@@ -1,9 +1,7 @@
 {
-  "parent" : "base",
   "properties": {
     "base:color": "0xD8D8D8",
-    "base:durability": 49,
     "tool_rod:durability_multiplier": 0.95,
-    "tool_rod:speed_multiplier": 1
+    "tool_rod:speed_multiplier": 1.0
   }
 }

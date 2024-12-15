@@ -4,7 +4,6 @@ import com.google.common.collect.Multimap;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
 import net.smok.Values;
@@ -20,7 +19,7 @@ public interface KovalItem {
     int getDurability(KovalStack stack);
     
     default List<Identifier> modelIds(KovalStack itemStack) {
-        return itemStack.getNbt() != null && itemStack.getNbt().contains(Values.NBT_PARTS, NbtElement.COMPOUND_TYPE) ?
-                new ArrayList<>(Assembly.nbtToItemsMap(itemStack.getNbt().getCompound(Values.NBT_PARTS)).values()) : List.of();
+        return itemStack.getNbt() != null && itemStack.getNbt().contains(Values.Json.PARTS, NbtElement.COMPOUND_TYPE) ?
+                new ArrayList<>(Assembly.nbtToItemsMap(itemStack.getNbt().getCompound(Values.Json.PARTS)).values()) : List.of();
     }
 }

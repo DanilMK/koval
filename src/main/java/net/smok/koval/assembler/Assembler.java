@@ -10,7 +10,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
-import net.smok.Debug;
 import net.smok.koval.KovalRegistry;
 import net.smok.Values;
 import net.smok.koval.MovablePlace;
@@ -82,7 +81,7 @@ public class Assembler implements Inventory {
 
     public boolean isPartSuitable(@NotNull Vec2Int pos, Part part) {
         if (pos.x() < 0 || pos.y() < 0 || pos.x() >= columns || pos.y() >= rows)
-            throw new IndexOutOfBoundsException(MessageFormat.format(Values.EXCEPTION_VEC_OUT_OF_BOUNDS, pos, new Vec2Int(0, 0), new Vec2Int(columns, rows)));
+            throw new IndexOutOfBoundsException(MessageFormat.format("Position {0} out of bounds: min = {1}, max = {2}", pos, new Vec2Int(0, 0), new Vec2Int(columns, rows)));
 
         if (part == null) return true;
 
@@ -138,7 +137,7 @@ public class Assembler implements Inventory {
     public void disassemble() {
         if (getResult().isEmpty() || !getResult().hasNbt()) return;
 
-        Map<Vec2Int, Identifier> map = Assembly.nbtToItemsMap(getResult().getSubNbt(Values.NBT_PARTS));
+        Map<Vec2Int, Identifier> map = Assembly.nbtToItemsMap(getResult().getSubNbt(Values.Json.PARTS));
         for (Vec2Int vec2Int : map.keySet())
             if (vec2Int.x() < 0 || vec2Int.y() < 0 || vec2Int.x() >= columns || vec2Int.y() >= rows) return;
 
@@ -163,7 +162,7 @@ public class Assembler implements Inventory {
 
         NbtCompound nbtCompound = Assembly.itemsMapToNbt(map);
         if (getResult().isEmpty() || !getResult().isOf(result)) setResult(new ItemStack(result));
-        getResult().setSubNbt(Values.NBT_PARTS, nbtCompound);
+        getResult().setSubNbt(Values.Json.PARTS, nbtCompound);
     }
 
     public void readNbt(NbtCompound nbt) {

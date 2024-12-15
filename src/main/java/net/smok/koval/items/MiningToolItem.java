@@ -14,6 +14,7 @@ import net.minecraft.tag.TagKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.smok.Values;
@@ -42,7 +43,7 @@ public class MiningToolItem extends net.minecraft.item.MiningToolItem implements
         KovalStack kovalStack = (KovalStack) (Object) stack;
         if (kovalStack == null || kovalStack.isBroken()) return 0;
         Assembly assembly = kovalStack.getAssembly();
-        if (isSuitableFor(stack, state)) return assembly.applyValue(Values.Parameters.MINING_SPEED, 0f, new ActionContext(state, null, null));
+        if (isSuitableFor(stack, state)) return assembly.applyValue(Values.Parameters.MINING_SPEED, 0f, ActionContext.builder().targetBlock(state).build());
         else return 0.5f;
     }
 
@@ -52,7 +53,7 @@ public class MiningToolItem extends net.minecraft.item.MiningToolItem implements
         KovalStack kovalStack = (KovalStack) (Object) stack;
         if (kovalStack != null) {
             Assembly assembly = kovalStack.getAssembly();
-            if (assembly != null) assembly.applyValue(new Identifier("mining:post_hit"), false, new ActionContext(null, attacker, target));
+            if (assembly != null) assembly.applyValue(new Identifier("mining:post_hit"), false, ActionContext.builder().targetEntity(target).user(attacker).build());
         }
 
         return super.postHit(stack, target, attacker);
@@ -64,7 +65,7 @@ public class MiningToolItem extends net.minecraft.item.MiningToolItem implements
         KovalStack kovalStack = (KovalStack) (Object) stack;
         if (kovalStack != null) {
             Assembly assembly = kovalStack.getAssembly();
-            if (assembly != null) assembly.applyValue(new Identifier("mining:post_mine"), false, new ActionContext(state, miner, null));
+            if (assembly != null) assembly.applyValue(new Identifier("mining:post_mine"), false, ActionContext.builder().targetBlock(state).user(miner).build());
         }
 
         return super.postMine(stack, world, state, pos, miner);
@@ -76,7 +77,7 @@ public class MiningToolItem extends net.minecraft.item.MiningToolItem implements
         if (kovalStack == null) return false;
         Assembly assembly = kovalStack.getAssembly();
 
-        ActionContext context = new ActionContext(state, null, null);
+        ActionContext context = ActionContext.builder().targetBlock(state).build();
         int miningLevel = assembly.applyValue(Values.Parameters.MINING_LEVEL, 0, context);
         boolean isEffective = assembly.applyValue(Values.Parameters.EFFECTIVE_BLOCKS, false, context);
         return MiningLevel.test(miningLevel, state, isEffective);
@@ -85,7 +86,7 @@ public class MiningToolItem extends net.minecraft.item.MiningToolItem implements
     @Override
     public int getDurability(KovalStack stack) {
         Assembly assembly = stack.getAssembly();
-        return (int) assembly.applyValue(Values.Parameters.DURABILITY, 0f, Context.EMPTY);
+        return assembly.applyValue(Values.Parameters.DURABILITY, 1, Context.EMPTY);
     }
 
 
@@ -118,5 +119,16 @@ public class MiningToolItem extends net.minecraft.item.MiningToolItem implements
         if (kovalStack == null) return;
         Assembly assembly = kovalStack.getAssembly();
         assembly.appendTooltip(tooltip);
+    }
+
+    @Override
+    public int getItemBarColor(ItemStack stack) {
+        float f = Math.max(0.0F, ((float) stack.getMaxDamage() - (float) stack.getDamage()) / (float) stack.getMaxDamage());
+        return MathHelper.hsvToRgb(f / 3.0F, 1.0F, 1.0F);
+    }
+
+    @Override
+    public int getItemBarStep(ItemStack stack) {
+        return Math.round(13.0F - (float) stack.getDamage() * 13.0F / (float) stack.getMaxDamage());
     }
 }

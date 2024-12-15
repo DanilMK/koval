@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings({"unused", "SameParameterValue"})
 public class ShapeDataProvider implements DataProvider {
 
     private static final Map<Identifier, ShapeData> dataMap = new HashMap<>();
@@ -26,6 +27,7 @@ public class ShapeDataProvider implements DataProvider {
     public static final Identifier EFFECTIVE = Values.Parameters.EFFECTIVE_BLOCKS;
     public static final Identifier DURABILITY = Values.Parameters.DURABILITY;
     public static final Identifier LEVEL = Values.Parameters.MINING_LEVEL;
+    public static final Identifier REPAIR_MATERIAL = Values.Parameters.REPAIR_MATERIAL;
 
     private static final Identifier MINING_HEAD = generate(new Identifier(Values.MOD_ID, "mining_head"), new ShapeData()
             .addProperty(ATTACK_DAMAGE, 6)
@@ -36,43 +38,20 @@ public class ShapeDataProvider implements DataProvider {
 
             .addParameter(DURABILITY, PropertyParameter.MATERIAL)
             .addParameter(LEVEL, PropertyParameter.MATERIAL)
-            .addParameter(MINING_SPEED, Functions.Numbers.ADD, PropertyParameter.MATERIAL, PropertyParameter.SHAPE)
-            .addParameter(ATTACK_SPEED, Functions.Numbers.ADD, PropertyParameter.MATERIAL, PropertyParameter.SHAPE)
-            .addParameter(ATTACK_DAMAGE, Functions.Numbers.ADD, PropertyParameter.MATERIAL, PropertyParameter.SHAPE)
-            .addParameter(EFFECTIVE, Functions.Blocks.BLOCK_STATE_IS_IN, FunctionParameter.of(Functions.Blocks.TARGET_BLOCK_STATE), PropertyParameter.SHAPE)
+            .addParameter(MINING_SPEED, Functions.Numbers.ADD, PropertyParameter.material(), PropertyParameter.shape())
+            .addParameter(ATTACK_SPEED, Functions.Numbers.ADD, PropertyParameter.material(), PropertyParameter.shape())
+            .addParameter(ATTACK_DAMAGE, Functions.Numbers.ADD, PropertyParameter.material(), PropertyParameter.shape())
+            .addParameter(EFFECTIVE, Functions.Blocks.BLOCK_STATE_IS_IN, FunctionParameter.of(Functions.Action.TARGET_BLOCK), PropertyParameter.shape())
+            .addParameter(REPAIR_MATERIAL, Functions.Items.ITEM_STACK_IS_IN, FunctionParameter.of(Functions.Action.TARGET_ITEM), PropertyParameter.material())
     );
 
-    private static final Identifier AXE_HEAD = generate(new Identifier(Values.MOD_ID, "axe_head"), new ShapeData(MINING_HEAD)
-            .addProperty(ATTACK_DAMAGE, 6)
-            .addProperty(ATTACK_SPEED, -3.2)
-            .addProperty(MINING_SPEED, 0)
-            .addProperty(EFFECTIVE, "mineable/axe")
-            .addAllDefaultPart(MaterialDataProvider.MiningIds)
-    );
+    private static final Identifier AXE_HEAD = generateHead("axe_head", 6, -3.2f, 0, "mineable/axe");
 
-    private static final Identifier PICKAXE_HEAD = generate(new Identifier(Values.MOD_ID, "pickaxe_head"), new ShapeData(MINING_HEAD)
-            .addProperty(ATTACK_DAMAGE, 1)
-            .addProperty(ATTACK_SPEED, 0)
-            .addProperty(MINING_SPEED, 0)
-            .addProperty(EFFECTIVE, "mineable/pickaxe")
-            .addAllDefaultPart(MaterialDataProvider.MiningIds)
-    );
+    private static final Identifier PICKAXE_HEAD = generateHead("pickaxe_head", 1, 0, 0, "mineable/pickaxe");
 
-    private static final Identifier SHOVEL_HEAD = generate(new Identifier(Values.MOD_ID, "shovel_head"), new ShapeData(MINING_HEAD)
-            .addProperty(ATTACK_DAMAGE, 1.5)
-            .addProperty(ATTACK_SPEED, -3)
-            .addProperty(MINING_SPEED, 0)
-            .addProperty(EFFECTIVE, "mineable/shovel")
-            .addAllDefaultPart(MaterialDataProvider.MiningIds)
-    );
+    private static final Identifier SHOVEL_HEAD = generateHead("shovel_head", 1.5f, -3, 0, "mineable/shovel");
 
-    private static final Identifier HOE_HEAD = generate(new Identifier(Values.MOD_ID, "hoe_head"), new ShapeData(MINING_HEAD)
-            .addProperty(ATTACK_DAMAGE, -2)
-            .addProperty(ATTACK_SPEED, -3)
-            .addProperty(MINING_SPEED, 0)
-            .addProperty(EFFECTIVE, "mineable/hoe")
-            .addAllDefaultPart(MaterialDataProvider.MiningIds)
-    );
+    private static final Identifier HOE_HEAD = generateHead("hoe_head", -2, -3, 0, "mineable/hoe");
 
     private static final Identifier TOOL_ROD = generate(new Identifier(Values.MOD_ID, "tool_rod"), new ShapeData()
             .addPart(MaterialDataProvider.BONE, Items.BONE)
@@ -87,6 +66,7 @@ public class ShapeDataProvider implements DataProvider {
             .addParameter(DURABILITY, Functions.Numbers.MULTIPLY,
                     PointerParameter.of(Number.class, Vec2Int.UP),
                     PropertyParameter.material(Values.Parameters.DURABILITY_MULTIPLIER))
+            .addParameter(Values.Parameters.FRAGILE, PropertyParameter.material())
     );
 
 
@@ -109,6 +89,14 @@ public class ShapeDataProvider implements DataProvider {
         return "Shapes";
     }
 
+    private static Identifier generateHead(String path, float attackDamage, float attackSpeed, float miningSpeed, String effective) {
+        return generate(new Identifier(Values.MOD_ID, path), new ShapeData(MINING_HEAD)
+                .addProperty(ATTACK_DAMAGE, attackDamage)
+                .addProperty(ATTACK_SPEED, attackSpeed)
+                .addProperty(MINING_SPEED, miningSpeed)
+                .addProperty(EFFECTIVE, effective)
+                .addAllDefaultPart(MaterialDataProvider.MiningIds));
+    }
 
     private static Identifier generate(Identifier identifier, ShapeData shape) {
         dataMap.put(identifier, shape);

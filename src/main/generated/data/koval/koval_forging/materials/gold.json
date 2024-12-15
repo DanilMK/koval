@@ -4,6 +4,8 @@
     "attack:speed": 0.0,
     "base:color": "0xFDFF76",
     "base:durability": 32,
+    "base:fragile": true,
+    "base:repair_material": "c:gold_ingots",
     "mining:level": 0,
     "mining:speed": 12.0,
     "tool_rod:durability_multiplier": 0.7,

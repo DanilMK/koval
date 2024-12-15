@@ -15,11 +15,21 @@
       ]
     },
     "base:durability": "#material",
-    "mining:effective_blocks": {
-      "function_id": "block:state_is_in",
+    "base:repair_material": {
+      "function_id": "item:is_in",
       "parameters": [
         {
-          "function_id": "action:target_block_state",
+          "function_id": "action:target_item",
+          "parameters": []
+        },
+        "#material"
+      ]
+    },
+    "mining:effective_blocks": {
+      "function_id": "block:is_in",
+      "parameters": [
+        {
+          "function_id": "action:target_block",
           "parameters": []
         },
         "#shape"

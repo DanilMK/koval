@@ -4,6 +4,8 @@
     "attack:speed": 1.0,
     "base:color": "0x867B86",
     "base:durability": 2031,
+    "base:fragile": false,
+    "base:repair_material": "c:netherite_ingots",
     "mining:level": 4,
     "mining:speed": 9.0
   }

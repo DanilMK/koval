@@ -4,13 +4,12 @@ import net.minecraft.util.Identifier;
 import net.smok.koval.forging.Context;
 import net.smok.koval.forging.ParameterPlace;
 import net.smok.utility.Vec2Int;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-public record MovablePlace(@Nullable Context context, Function<Vec2Int, Part> tableGetter, Part part,
+public record MovablePlace(@NotNull Context context, Function<Vec2Int, Part> tableGetter, Part part,
                            Vec2Int position, Identifier parameterId) implements ParameterPlace {
 
 
@@ -23,11 +22,4 @@ public record MovablePlace(@Nullable Context context, Function<Vec2Int, Part> ta
     }
 
 
-    @Override
-    public String toString() {
-        return "ActionContext[" +
-                "tableGetter=" + tableGetter + ", " +
-                "part=" + part + ", " +
-                "position=" + position + ']';
-    }
 }

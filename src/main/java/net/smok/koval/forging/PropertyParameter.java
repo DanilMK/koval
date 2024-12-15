@@ -14,27 +14,29 @@ import java.util.Optional;
 public final class PropertyParameter<T> extends AbstractParameter<T> {
 
     private enum PropertyType {
-        MATERIAL, SHAPE;
+        MATERIAL, SHAPE
     }
 
     private @Nullable final Identifier identifier;
     private @NotNull final PropertyType type;
 
 
-    public static PropertyParameter<?> material(Identifier identifier) { return new PropertyParameter<>(identifier, PropertyType.MATERIAL); }
-    public static PropertyParameter<?> shape(Identifier identifier) { return new PropertyParameter<>(identifier, PropertyType.SHAPE); }
+    public static <T> PropertyParameter<T> material(Identifier identifier) { return new PropertyParameter<>(identifier, PropertyType.MATERIAL); }
+    public static <T> PropertyParameter<T> shape(Identifier identifier) { return new PropertyParameter<>(identifier, PropertyType.SHAPE); }
+    @SuppressWarnings("unchecked") public static <T> PropertyParameter<T> shape() { return (PropertyParameter<T>) SHAPE; }
+    @SuppressWarnings("unchecked") public static <T> PropertyParameter<T> material() { return (PropertyParameter<T>) MATERIAL; }
     public static PropertyParameter<?> MATERIAL = new PropertyParameter<>(null, PropertyType.MATERIAL);
     public static PropertyParameter<?> SHAPE = new PropertyParameter<>(null, PropertyType.SHAPE);
 
-    public static PropertyParameter<?> fromString(String typeString) {
+    public static <T> PropertyParameter<T> fromString(String typeString) {
         return switch (typeString.toLowerCase()) {
-            case "#materials", "#material" -> MATERIAL;
-            case "#shapes", "#shape" -> SHAPE;
+            case "#materials", "#material" -> material();
+            case "#shapes", "#shape" -> shape();
             default -> throw Values.Json.exceptionInvalidPropertyType(typeString);
         };
     }
 
-    public static PropertyParameter<?> fromString(String typeString, Identifier identifier) {
+    public static <T> PropertyParameter<T> fromString(String typeString, Identifier identifier) {
         return switch (typeString.toLowerCase()) {
             case "#materials", "#material" -> material(identifier);
             case "#shapes", "#shape" -> shape(identifier);
@@ -79,13 +81,27 @@ public final class PropertyParameter<T> extends AbstractParameter<T> {
         Identifier id = this.identifier != null ? this.identifier : identifier;
 
         return switch (type) {
-            case SHAPE -> shape.getProperties().getValue(id).clone();
-            case MATERIAL -> material.properties().getValue(id).clone();
+            case SHAPE -> {
+                if (!shape.getProperties().properties.containsKey(id)) throw new NullPointerException("Cannot find "+ id +" in shape properties");
+                yield shape.getProperties().properties.get(id).clone();
+            }
+            case MATERIAL -> {
+                if (!material.properties().properties.containsKey(id)) throw new NullPointerException("Cannot find "+ id +" in material properties");
+                yield material.properties().properties.get(id).clone();
+            }
         };
     }
 
     @Override
     public PropertyParameter<T> clone() {
         return new PropertyParameter<>(identifier, type);
+    }
+
+    @Override
+    public String toString() {
+        return "PropertyParameter{" +
+                " identifier=" + identifier +
+                ", type=" + type +
+                '}';
     }
 }

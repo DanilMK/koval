@@ -2,6 +2,7 @@ package net.smok.koval.data;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.smok.Values;
 import net.smok.koval.forging.*;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 
+@SuppressWarnings("unused")
 public class MaterialData {
 
     @Nullable private final Identifier parent;
@@ -24,22 +26,22 @@ public class MaterialData {
         this.parent = parent;
     }
 
-    public <T, U, R> MaterialData addParameter(Identifier identifier, BiKovalFunction<T, U, R> function, AbstractParameter fist, AbstractParameter second) {
+    public <T, U, R> MaterialData addParameter(Identifier identifier, BiKovalFunction<T, U, R> function, AbstractParameter<T> fist, AbstractParameter<U> second) {
         parameters.add(identifier, FunctionParameter.of(function, fist, second));
         return this;
     }
 
-    public <T, R> MaterialData addParameter(Identifier identifier, MonoKovalFunction<T, R> function, AbstractParameter parameter) {
+    public <T, R> MaterialData addParameter(Identifier identifier, MonoKovalFunction<T, R> function, AbstractParameter<T> parameter) {
         parameters.add(identifier, FunctionParameter.of(function, parameter));
         return this;
     }
 
-    public <R> MaterialData addParameter(Identifier identifier, KovalFunction<R> function, AbstractParameter... params) {
+    public <R> MaterialData addParameter(Identifier identifier, KovalFunction<R> function, AbstractParameter<?>... params) {
         parameters.add(identifier, FunctionParameter.of(function, params));
         return this;
     }
     
-    public MaterialData addParameter(Identifier identifier, AbstractParameter parameter) {
+    public MaterialData addParameter(Identifier identifier, AbstractParameter<?> parameter) {
         parameters.add(identifier, parameter);
         return this;
     }
@@ -49,6 +51,10 @@ public class MaterialData {
 
     public MaterialData addColor(int color) {
         return addProperty(Values.Parameters.COLOR, "0x" + Integer.toHexString(color).toUpperCase());
+    }
+
+    public MaterialData addProperty(Identifier id, TagKey<?> property) {
+        return addProperty(id.toString(), new JsonPrimitive(property.id().toString()));
     }
 
     public MaterialData addProperty(Identifier id, boolean property) {

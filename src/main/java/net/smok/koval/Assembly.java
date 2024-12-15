@@ -24,18 +24,6 @@ public class Assembly {
     // Static
 
     @Contract("_ -> new")
-    public static @NotNull Assembly fromItemsMap(@NotNull Map<Vec2Int, Identifier> items) {
-        Map<Vec2Int, net.smok.koval.Part> parts = items.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
-                entry -> KovalRegistry.PARTS.get(entry.getValue())));
-        return new Assembly(parts, assemble(parts));
-    }
-
-    @Contract("_ -> new")
-    public static @NotNull Assembly fromPartsMap(@NotNull Map<Vec2Int, net.smok.koval.Part> parts) {
-        return new Assembly(parts, assemble(parts));
-    }
-
-    @Contract("_ -> new")
     public static @NotNull Assembly fromNbt(@NotNull NbtCompound nbt) {
         Map<Vec2Int, net.smok.koval.Part> parts = nbtToPartsMap(nbt);
         return new Assembly(parts, assemble(parts));
@@ -48,7 +36,10 @@ public class Assembly {
 
     @Contract("_ -> new")
     public static @NotNull Map<Vec2Int, net.smok.koval.Part> nbtToPartsMap(@NotNull NbtCompound nbt) {
-        return nbt.getKeys().stream().collect(Collectors.toMap(Vec2Int::fromString, string -> KovalRegistry.PARTS.get(new Identifier(nbt.getString(string)))));
+        Map<Vec2Int, Part> map = new HashMap<>();
+        for (String string : nbt.getKeys())
+            map.put(Vec2Int.fromString(string), KovalRegistry.PARTS.get(new Identifier(nbt.getString(string))));
+        return map;
     }
 
     public static @NotNull NbtCompound itemsMapToNbt(@NotNull Map<Vec2Int, Identifier> map) {
@@ -156,16 +147,16 @@ public class Assembly {
 
 
 
-    public int applyValue(Identifier valueId, int start, @Nullable Context context) {
-        return applyObjectValue(valueId, Number.class, context).orElse(start).intValue();
+    public int applyValue(Identifier valueId, int defaultValue, @Nullable Context context) {
+        return applyObjectValue(valueId, Number.class, context).orElse(defaultValue).intValue();
     }
 
-    public float applyValue(Identifier valueId, float start, @Nullable Context context) {
-        return applyObjectValue(valueId, Number.class, context).orElse(start).floatValue();
+    public float applyValue(Identifier valueId, float defaultValue, @Nullable Context context) {
+        return applyObjectValue(valueId, Number.class, context).orElse(defaultValue).floatValue();
     }
 
-    public boolean applyValue(Identifier valueId, boolean start, @Nullable Context context) {
-        return applyObjectValue(valueId, Boolean.class, context).orElse(start);
+    public boolean applyValue(Identifier valueId, boolean defaultValue, @Nullable Context context) {
+        return applyObjectValue(valueId, Boolean.class, context).orElse(defaultValue);
     }
 
     public <T> Optional<T> applyObjectValue(Identifier identifier, Class<T> type, @Nullable Context context) {
@@ -182,12 +173,12 @@ public class Assembly {
         functions.forEach((identifier, partRecord) ->
                 tooltip.add(Text.translatable(identifier.toTranslationKey("koval.parameter"))
                 .append(": ")
-                .append(partRecord.parameter.getText(partRecord.getContext(parts, null, identifier)))
+                .append(partRecord.parameter.getText(partRecord.getContext(parts, Context.EMPTY, identifier)))
                 .styled(style -> style.withColor(partRecord.part.material().color()))
                 ));
     }
 
-    private record PartRecord(Vec2Int pos, Part part, AbstractParameter parameter) {
+    private record PartRecord(Vec2Int pos, Part part, AbstractParameter<?> parameter) {
 
         @Override
         public boolean equals(Object object) {
@@ -202,7 +193,7 @@ public class Assembly {
             return Objects.hashCode(pos);
         }
 
-        public MovablePlace getContext(Map<Vec2Int, Part> parts, @Nullable Context context, Identifier identifier) {
+        public MovablePlace getContext(Map<Vec2Int, Part> parts, Context context, Identifier identifier) {
             return new MovablePlace(context, parts::get, part, pos, identifier);
         }
     }

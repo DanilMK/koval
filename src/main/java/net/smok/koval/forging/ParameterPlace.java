@@ -3,7 +3,7 @@ package net.smok.koval.forging;
 import net.minecraft.util.Identifier;
 import net.smok.koval.Part;
 import net.smok.utility.Vec2Int;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -23,10 +23,7 @@ public interface ParameterPlace {
         return Optional.empty();
     }
 
-    default AbstractParameter<?> moveParameter(Identifier identifier) {
-        return part().parameters().get(identifier);
-    }
 
-
-    @Nullable Context context();
+    @NotNull
+    Context context();
 }

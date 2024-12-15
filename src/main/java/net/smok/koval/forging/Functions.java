@@ -1,15 +1,16 @@
 package net.smok.koval.forging;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tag.TagKey;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.smok.Debug;
 import net.smok.koval.KovalRegistry;
-import net.smok.utility.NumberUtils;
 import org.apache.commons.lang3.function.TriFunction;
 
-import java.util.Optional;
+import java.util.ArrayList;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -23,24 +24,58 @@ public final class Functions {
         public static final String NAMESPACE = "number";
 
         public static final BiKovalFunction<Number, Number, Number> ADD = register(
-                "add", (actionParams, a, b) -> NumberUtils.add(a, b));
+                "add", (a, b) -> a + b, (a, b) -> a + b);
 
         public static final BiKovalFunction<Number, Number, Number> SUBTRACT = register(
-                "subtract", (actionParams, a, b) -> NumberUtils.subtract(a, b));
+                "subtract", (a, b) -> a - b, (a, b) -> a - b);
 
         public static final BiKovalFunction<Number, Number, Number> MULTIPLY = register(
-                "multiply", (actionParams, a, b) -> NumberUtils.multiply(a, b));
+                "multiply", (a, b) -> a * b, (a, b) -> a * b);
 
         public static final BiKovalFunction<Number, Number, Number> DIVIDE = register(
-                "divide", (actionParams, a, b) -> NumberUtils.divide(a, b));
+                "divide", (a, b) -> a / b, (a, b) -> a / b);
+
+        public static final BiKovalFunction<Number, Number, Number> MIN = register(
+                "min", (a, b) -> Math.min(a, b), (a, b) -> Math.min(a, b));
+
+        public static final BiKovalFunction<Number, Number, Number> MAX = register(
+                "max", (a, b) -> Math.max(a, b), (a, b) -> Math.max(a, b));
+
+        public static final MultiFunction<Number, Number> SUM = register(
+                "sum", 1, (place, list) -> {
+                    int i = 0;
+                    float f = 0;
+
+                    for (Number number : list) {
+                        if (number instanceof Float)
+                             f += number.floatValue();
+                        else i += number.intValue();
+                    }
+                    return f > 0 ? f + i : i;
+                }
+        );
 
 
-        // todo add min and rethink Numbers
-        
-        private static BiKovalFunction<Number, Number, Number> register(String path, TriFunction<ParameterPlace, Number, Number, Number> function) {
-            BiKovalFunction<Number, Number, Number> result = new BiKovalFunction<>(Number.class, Number.class, Number.class, function);
+        private static BiKovalFunction<Number, Number, Number> register(
+                String path,
+                BiFunction<Integer, Integer, Integer> intFunction,
+                BiFunction<Float, Float, Float> floatFunction)
+        {
+            BiKovalFunction<Number, Number, Number> result = new BiKovalFunction<>(Number.class, Number.class, Number.class, (place, a, b) -> {
+                if (a instanceof Float || b instanceof Float)
+                    return floatFunction.apply(a.floatValue(), b.floatValue());
+                    return intFunction.apply(a.intValue(), b.intValue());
+            });
             return Registry.register(KovalRegistry.FUNCTIONS, new Identifier(NAMESPACE, path), result);
         }
+
+        private static MultiFunction<Number, Number> register(
+                String path, int minParamsAmount, BiFunction<ParameterPlace, ArrayList<Number>, Number> function)
+        {
+            return Registry.register(KovalRegistry.FUNCTIONS, new Identifier(NAMESPACE, path),
+                    new MultiFunction<>(Number.class, Number.class, minParamsAmount, function));
+        }
+
 
         public static String init() {
             return NAMESPACE;
@@ -84,26 +119,12 @@ public final class Functions {
     public static final class Blocks {
         public static final String NAMESPACE = "block";
 
-        public static final MonoKovalFunction<String, Boolean> BLOCK_IS_IN = (MonoKovalFunction<String, Boolean>) register(
-                new Identifier("block:is_in"), String.class, Boolean.class, (place, inner) ->
-                {
-                    if (place.context() instanceof ActionContext actionContext) {
-                        BlockState targetBlock = actionContext.targetBlock();
-                        return targetBlock != null && targetBlock.isIn(TagKey.of(Registry.BLOCK_KEY, new Identifier(inner)));
-                    }
-                    return false;
-                }
-        ).setCanSumResult(false);
 
         public static final BiKovalFunction<BlockState, String, Boolean> BLOCK_STATE_IS_IN = register(
-                new Identifier("block:state_is_in"), BlockState.class, String.class, Boolean.class,
+                new Identifier("block:is_in"), BlockState.class, String.class, Boolean.class,
                 (actionParams, blockState, tag) -> blockState != null && blockState.isIn(TagKey.of(Registry.BLOCK_KEY, new Identifier(tag)))
         );
 
-        public static final KovalFunction<BlockState> TARGET_BLOCK_STATE = register(
-                new Identifier("action:target_block_state"), BlockState.class,
-                kovalContext -> kovalContext.context() instanceof ActionContext actionContext ? actionContext.targetBlock() : null
-        );
 
         public static String init() {
             return NAMESPACE;
@@ -114,10 +135,35 @@ public final class Functions {
     public static final class Items {
         public static final String NAMESPACE = "item";
 
+        public static final BiKovalFunction<ItemStack, String, Boolean> ITEM_STACK_IS_IN = register(
+                new Identifier("item:is_in"), ItemStack.class, String.class, Boolean.class,
+                (actionParams, itemStack, tag) -> itemStack != null && itemStack.isIn(TagKey.of(Registry.ITEM_KEY, new Identifier(tag))),
+                (place, itemStack, string) -> Text.of(string)
+        );
 
         public static String init() {
             return NAMESPACE;
         }
+    }
+
+    public static final class Action {
+
+        public static final String NAMESPACE = "block";
+
+        public static final OutFunction<BlockState> TARGET_BLOCK = register(
+                new Identifier("action:target_block"), BlockState.class,
+                place -> place.context() instanceof ActionContext actionContext ? actionContext.targetBlock() : null
+        );
+
+        public static final KovalFunction<ItemStack> TARGET_ITEM = register(
+                new Identifier("action:target_item"), ItemStack.class,
+                place -> place.context() instanceof ActionContext actionContext ? actionContext.targetItem() : null
+        );
+
+        public static String init() {
+            return NAMESPACE;
+        }
+
     }
 
 
@@ -140,27 +186,31 @@ public final class Functions {
 
 
 
-    private static <R> KovalFunction<R> register(Identifier id, Class<R> r, Function<ParameterPlace, R> function) {
-        KovalFunction<R> result = new KovalFunction<>(r) {
-            @Override
-            public Optional<R> apply(ParameterPlace context, AbstractParameter<?>[] parameters) {
-                return Optional.ofNullable(function.apply(context));
-            }
-        };
-        return Registry.register(KovalRegistry.FUNCTIONS, id, result);
+
+    private static <T, R> OutFunction<R> register(Identifier id, Class<R> r, Function<ParameterPlace, R> function) {
+        return Registry.register(KovalRegistry.FUNCTIONS, id, new OutFunction<R>(r, function));
     }
 
-    private static <T, R> MonoKovalFunction<T, R> register(Identifier id, Class<T> inner, Class<R> r, BiFunction<ParameterPlace, T, R> function) {
-        MonoKovalFunction<T, R> result = new MonoKovalFunction<>(inner, r, function);
-        return Registry.register(KovalRegistry.FUNCTIONS, id, result);
+    private static <T, R> MonoKovalFunction<T, R> register(Identifier id, Class<T> inner, Class<R> r,
+                                                           BiFunction<ParameterPlace, T, R> function) {
+
+        return Registry.register(KovalRegistry.FUNCTIONS, id, new MonoKovalFunction<T, R>(inner, r, function));
     }
 
-    private static <T, U, R> BiKovalFunction<T, U, R> register(Identifier id, Class<T> a, Class<U> b, Class<R> r, TriFunction<ParameterPlace, T, U, R> function) {
-        BiKovalFunction<T, U, R> result = new BiKovalFunction<>(a, b, r, function);
-        return Registry.register(KovalRegistry.FUNCTIONS, id, result);
+    private static <T, U, R> BiKovalFunction<T, U, R> register(Identifier id, Class<T> a, Class<U> b, Class<R> r,
+                                                               TriFunction<ParameterPlace, T, U, R> function) {
+
+        return Registry.register(KovalRegistry.FUNCTIONS, id, new BiKovalFunction<T, U, R>(a, b, r, function));
+    }
+
+    private static <T, U, R> BiKovalFunction<T, U, R> register(Identifier id, Class<T> a, Class<U> b, Class<R> r,
+                                                               TriFunction<ParameterPlace, T, U, R> function,
+                                                               TriFunction<ParameterPlace, T, U, Text> textFunction) {
+
+        return Registry.register(KovalRegistry.FUNCTIONS, id, new BiKovalFunction<T, U, R>(a, b, r, function));
     }
 
     public static void init() {
-        Debug.log("Register functions: "+Numbers.init()+", "+Booleans.init()+", "+Items.init()+", "+Blocks.init()+", "+Assemblers.init());
+        Debug.log("Register functions: "+Numbers.init()+", "+Booleans.init()+", "+Items.init()+", "+Blocks.init()+", "+Assemblers.init()+", "+Action.init());
     }
 }

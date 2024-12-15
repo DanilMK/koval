@@ -7,6 +7,7 @@ import net.smok.koval.forging.Context;
 import net.smok.koval.forging.ParameterPlace;
 import net.smok.koval.forging.ParametersGroup;
 import net.smok.utility.Vec2Int;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -34,8 +35,8 @@ public record Part(Shape shape, Material material, ParametersGroup parameters) {
     @Override
     public String toString() {
         return "Part{" +
-                "shape=" + shape +
-                ", material=" + material +
+                "shape=" + KovalRegistry.SHAPES.getId(shape) +
+                ", material=" + KovalRegistry.MATERIALS.getId(material) +
                 ", parameters=" + parameters +
                 '}';
     }
@@ -58,8 +59,8 @@ public record Part(Shape shape, Material material, ParametersGroup parameters) {
             }
 
             @Override
-            public @Nullable Context context() {
-                return null;
+            public @NotNull Context context() {
+                return Context.EMPTY;
             }
         };
     }

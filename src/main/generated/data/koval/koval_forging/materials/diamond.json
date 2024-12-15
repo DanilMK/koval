@@ -4,6 +4,8 @@
     "attack:speed": 1.0,
     "base:color": "0x33EBCB",
     "base:durability": 1561,
+    "base:fragile": true,
+    "base:repair_material": "c:diamonds",
     "mining:level": 3,
     "mining:speed": 8.0
   }

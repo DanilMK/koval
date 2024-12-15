@@ -4,6 +4,8 @@
     "attack:speed": 0.0,
     "base:color": "0xA1662F",
     "base:durability": 59,
+    "base:fragile": true,
+    "base:repair_material": "minecraft:planks",
     "mining:level": 0,
     "mining:speed": 2.0,
     "tool_rod:durability_multiplier": 1.0,

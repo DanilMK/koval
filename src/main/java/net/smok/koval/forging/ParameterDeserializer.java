@@ -34,8 +34,8 @@ public class ParameterDeserializer {
         } else if (isPointerParameter(json)) {
             return deserializePointer(json.getAsJsonObject(), expectedType);
         } else if (isPropertyParameter(json)) {
-            if (json.isJsonObject()) return (AbstractParameter<T>) deserializeProperty(json.getAsJsonObject());
-            else return (AbstractParameter<T>) deserializeProperty(json.getAsJsonPrimitive());
+            if (json.isJsonObject()) return deserializeProperty(json.getAsJsonObject());
+            else return deserializeProperty(json.getAsJsonPrimitive());
         } else if (isPrimitiveParameter(json)) {
             return deserializePrimitive(json.getAsJsonPrimitive(), expectedType);
         }
@@ -74,7 +74,11 @@ public class ParameterDeserializer {
     public @NotNull PrimitiveParameter<?> deserializePrimitive(JsonPrimitive json) {
 
         if (json.isBoolean()) return PrimitiveParameter.of(json.getAsBoolean());
-        if (json.isNumber()) return PrimitiveParameter.of(json.getAsNumber());
+        if (json.isNumber()) {
+            if ((float) json.getAsNumber().intValue() == json.getAsNumber().floatValue())
+                return PrimitiveParameter.of(json.getAsInt());
+            return PrimitiveParameter.of(json.getAsFloat());
+        }
         if (json.isString()) return PrimitiveParameter.of(json.getAsString());
 
         throw Values.Json.exceptionInvalidPrimitive(json);
@@ -85,7 +89,11 @@ public class ParameterDeserializer {
     @Contract("_, _ -> new")
     public <T> @NotNull PrimitiveParameter<T> deserializePrimitive(JsonPrimitive json, @NotNull Class<T> type) {
         if (Boolean.TYPE.isAssignableFrom(type) && json.isBoolean()) return (PrimitiveParameter<T>) PrimitiveParameter.of(json.getAsBoolean());
-        if (Number.class.isAssignableFrom(type) && json.isNumber()) return (PrimitiveParameter<T>) PrimitiveParameter.of(json.getAsNumber());
+        if (Number.class.isAssignableFrom(type) && json.isNumber()) {
+            if ((float) json.getAsNumber().intValue() == json.getAsNumber().floatValue())
+                return (PrimitiveParameter<T>) PrimitiveParameter.of(json.getAsInt());
+            return (PrimitiveParameter<T>) PrimitiveParameter.of(json.getAsFloat());
+        }
         if (String.class.isAssignableFrom(type) && json.isString()) return (PrimitiveParameter<T>) PrimitiveParameter.of(json.getAsString());
         throw Values.Json.exceptionInvalidParameterType(type, json.toString());
     }
@@ -93,7 +101,7 @@ public class ParameterDeserializer {
 
 
     @Contract("_ -> new")
-    public @NotNull PropertyParameter<?> deserializeProperty(@NotNull JsonObject json) {
+    public <T> @NotNull PropertyParameter<T> deserializeProperty(@NotNull JsonObject json) {
 
         Identifier id = getIdentifier(json);
         String typeString = json.get(Values.Json.PROPERTY_TYPE).getAsJsonPrimitive().getAsString();
@@ -104,7 +112,7 @@ public class ParameterDeserializer {
 
 
     @Contract("_ -> new")
-    public @NotNull PropertyParameter<?> deserializeProperty(@NotNull JsonPrimitive json) {
+    public @NotNull <T> PropertyParameter<T> deserializeProperty(@NotNull JsonPrimitive json) {
         return PropertyParameter.fromString(json.getAsString());
     }
 
@@ -128,16 +136,15 @@ public class ParameterDeserializer {
 
         // Check function
         if (function == null) throw Values.Json.exceptionUnknownFunctionType(functionId);
-        int innerParametersCount = function.innerParametersCount();
 
 
         // Function without params
-        if (innerParametersCount == 0)
+        if (function.innerParametersCount() == 0)
             return FunctionParameter.of(function);
 
 
         // Function with params
-        AbstractParameter<?>[] params = collectFunctionParams(json, identifier, innerParametersCount, function);
+        AbstractParameter<?>[] params = collectFunctionParams(json, identifier, function);
         return FunctionParameter.of(function, params);
     }
 
@@ -149,28 +156,27 @@ public class ParameterDeserializer {
 
         // Check function
         if (function == null) throw Values.Json.exceptionUnknownFunctionType(functionId);
-        int innerParametersCount = function.innerParametersCount();
         if (function.returnType() != expectedType) throw Values.Json.exceptionInvalidFunctionType(expectedType, function.returnType());
         @SuppressWarnings("unchecked")
         KovalFunction<T> typedFunction = (KovalFunction<T>) function;
 
         // Function without params
-        if (innerParametersCount == 0)
+        if (function.innerParametersCount() == 0)
             return FunctionParameter.of(typedFunction);// (new FunctionParameter<>(function, new AbstractParameter[0]));
 
         // Function with params
-        AbstractParameter<?>[] params = collectFunctionParams(json, identifier, innerParametersCount, typedFunction);
+        AbstractParameter<?>[] params = collectFunctionParams(json, identifier, typedFunction);
         return FunctionParameter.of(typedFunction, params);
     }
 
-    private static AbstractParameter<?> @NotNull [] collectFunctionParams(@NotNull JsonObject json, Identifier identifier, int innerParametersCount, KovalFunction<?> function) {
+    private static AbstractParameter<?> @NotNull [] collectFunctionParams(@NotNull JsonObject json, Identifier identifier, KovalFunction<?> function) {
         JsonArray paramsArray = json.get(Values.Json.PARAMETERS).getAsJsonArray();
 
-        if (innerParametersCount != paramsArray.size()) throw Values.Json.exceptionInvalidParametersAmount(innerParametersCount, paramsArray.size());
-        AbstractParameter<?>[] params = new AbstractParameter[innerParametersCount];
+        function.checkSize(paramsArray.size());
+        AbstractParameter<?>[] params = new AbstractParameter[paramsArray.size()];
 
         Class<?>[] parametersTypes = function.getParametersTypes();
-        for (int i = 0; i < parametersTypes.length; i++) {
+        for (int i = 0; i < paramsArray.size(); i++) {
 
             ParameterDeserializer parameterDeserializer = new ParameterDeserializer();
             params[i] = parameterDeserializer.deserialize(paramsArray.get(i), identifier, parametersTypes[i]);

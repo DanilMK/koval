@@ -21,7 +21,7 @@ public abstract class AbstractParameter<T> {
 
     public abstract Class<T> getValueType();
 
-    public Text toText(Identifier identifier, @NotNull Object object) {
+    public static Text toText(Identifier identifier, @NotNull Object object) {
         if (identifier.equals(Values.Parameters.ATTACK_DAMAGE) && object instanceof Number n)
             return Text.literal(NumberUtils.add(n, 1f).toString());
         if (identifier.equals(Values.Parameters.ATTACK_SPEED) && object instanceof Number n)
@@ -64,7 +64,7 @@ public abstract class AbstractParameter<T> {
 
 
     /**
-     * @param identifier
+     * @param identifier parameter identifier.
      * @param shape      own shape.
      * @param material   own material.
      * @return return this parameter or initialized clone.

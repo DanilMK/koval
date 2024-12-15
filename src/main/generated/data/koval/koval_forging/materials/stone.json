@@ -4,6 +4,8 @@
     "attack:speed": 0.0,
     "base:color": "0x9A9AA9A",
     "base:durability": 131,
+    "base:fragile": true,
+    "base:repair_material": "minecraft:stone_tool_materials",
     "mining:level": 1,
     "mining:speed": 4.0,
     "tool_rod:durability_multiplier": 1.2,

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class ShapeData {
 
     @Nullable private final Identifier parent;
@@ -37,7 +38,7 @@ public class ShapeData {
         return this;
     }
 
-    public ShapeData addRecipe(AbstractParameter condition, Item result) {
+    public ShapeData addRecipe(AbstractParameter<Boolean> condition, Item result) {
         recipes.add(new AssembleRecipe(condition, result));
         return this;
     }
@@ -89,10 +90,6 @@ public class ShapeData {
 
     public <T, R> ShapeData addParameter(Identifier identifier, MonoKovalFunction<T, R> function, AbstractParameter<T> parameter) {
         return addParameter(identifier, FunctionParameter.of(function, parameter));
-    }
-
-    public <R> ShapeData addParameter(Identifier identifier, KovalFunction<R> function, AbstractParameter<?>... params) {
-        return addParameter(identifier, FunctionParameter.of(function, params));
     }
 
     public ShapeData addParameter(Identifier identifier, AbstractParameter<?> parameter) {

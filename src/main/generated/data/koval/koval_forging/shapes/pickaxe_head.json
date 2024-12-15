@@ -9,9 +9,9 @@
     "koval:wood": "koval:#material_#shape"
   },
   "properties": {
-    "attack:damage": 1.5,
-    "attack:speed": -3,
-    "mining:effective_blocks": "mineable/shovel",
-    "mining:speed": 0
+    "attack:damage": 1.0,
+    "attack:speed": 0.0,
+    "mining:effective_blocks": "mineable/pickaxe",
+    "mining:speed": 0.0
   }
 }

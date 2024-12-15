@@ -36,13 +36,13 @@ public class FunctionParameter<R> extends AbstractParameter<R> {
 
     @Contract("_, _ -> new")
     public static <R> @NotNull FunctionParameter<R> of(@NotNull KovalFunction<R> function, AbstractParameter<?>... parameters) {
-        if (function.innerParametersCount() != parameters.length) throw Values.Json.exceptionInvalidParametersAmount(function.innerParametersCount(), parameters.length);
+        function.checkSize(parameters.length);
         return new FunctionParameter<>(function, parameters);
     }
 
     @Contract("_ -> new")
     public static <R> @NotNull FunctionParameter<R> of(@NotNull KovalFunction<R> function) {
-        if (function.innerParametersCount() != 0) throw Values.Json.exceptionInvalidParametersAmount(function.innerParametersCount(), 0);
+        function.checkSize(0);
         return new FunctionParameter<>(function, EMPTY_PARAMETERS);
     }
 
@@ -63,10 +63,9 @@ public class FunctionParameter<R> extends AbstractParameter<R> {
 
     @Override
     public Text getText(ParameterPlace place) {
-        if (function.canSumResult()) {
-            Optional<R> o = get(place);
-            if (o.isPresent()) return toText(place.parameterId(), o.get());
-        }
+
+        Optional<R> o = get(place);
+        if (o.isPresent()) return toText(place.parameterId(), o.get());
 
         Identifier id = KovalRegistry.FUNCTIONS.getId(function);
         if (id == null) return Text.translatable("koval.function.unknown");
@@ -119,5 +118,14 @@ public class FunctionParameter<R> extends AbstractParameter<R> {
     @Override
     public AbstractParameter<R> clone() {
         return new FunctionParameter<>(function, parameters);
+    }
+
+    @Override
+    public String toString() {
+        Identifier id = KovalRegistry.FUNCTIONS.getId(function);
+        return "FunctionParameter{" +
+                " function=" + (id != null ? id : function) +
+                ", parameters=" + Arrays.toString(parameters) +
+                '}';
     }
 }

@@ -10,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.smok.koval.assembler.AssemblerBlockFactory;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Type;
 import java.text.MessageFormat;
 
+@SuppressWarnings("unused")
 public final class Values {
     public static final String MOD_ID = "koval";
 
@@ -45,19 +47,6 @@ public final class Values {
             new String[] {"gold", "iron", "stone"},
             new String[] {"tool_rod"}
     }).register();
-
-
-    public static final String FILE_FILE_READ_EXCEPTION = "An exception occurred while reading the {0} file. This file will be skipped.\n";
-    public static final String EXCEPTION_UNKNOWN_PARENT = "{0}: Cannot find parent {1} for provided part.";
-    public static final String EXCEPTION_UNKNOWN_MATERIAL = "{0}: Cannot find material {1} for provided part.";
-    public static final String EXCEPTION_EMPTY_PARENT = "{0}: Parent field can't be empty";
-    public static final String EXCEPTION_ASSEMBLY_NULL_PART = "Incorrect part identifier {0} return Null part.";
-    public static final String EXCEPTION_VEC_OUT_OF_BOUNDS = "Position {0} out of bounds: min = {1}, max = {2}";
-
-    public static final String MATERIALS_DIR = "materials";
-    public static final String SHAPES_DIR = "shapes";
-    public static final String NBT_PARTS = "Parts";
-    public static final String INVALID_VALUE_TYPE_EXCEPTION = "The expected value type is {0}, but the provided value is {1}";
 
 
     public static final class Json {
@@ -125,9 +114,18 @@ public final class Values {
         public static final Identifier COLOR = new Identifier("base", "color");
         public static final Identifier REPAIR_MATERIAL = new Identifier("base", "repair_material");
         public static final Identifier ATTRIBUTE_MODIFIER = new Identifier("base", "attribute_modifier");
+        public static final Identifier FRAGILE = new Identifier("base", "fragile");
 
         public static final Identifier DURABILITY_MULTIPLIER = new Identifier("tool_rod", "durability_multiplier");
         public static final Identifier SPEED_MULTIPLIER = new Identifier("tool_rod", "speed_multiplier");
 
+    }
+
+    public static final class Tags {
+
+        public static final TagKey<Item> IRON = TagKey.of(Registry.ITEM_KEY, new Identifier("c:iron_ingots"));
+        public static final TagKey<Item> GOLD = TagKey.of(Registry.ITEM_KEY, new Identifier("c:gold_ingots"));
+        public static final TagKey<Item> DIAMOND = TagKey.of(Registry.ITEM_KEY, new Identifier("c:diamonds"));
+        public static final TagKey<Item> NETHERITE = TagKey.of(Registry.ITEM_KEY, new Identifier("c:netherite_ingots"));
     }
 }

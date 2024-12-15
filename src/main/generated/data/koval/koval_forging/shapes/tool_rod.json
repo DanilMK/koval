@@ -13,6 +13,7 @@
         }
       ]
     },
+    "base:fragile": "#material",
     "mining:speed": {
       "function_id": "number:multiply",
       "parameters": [

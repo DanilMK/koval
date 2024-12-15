@@ -38,10 +38,16 @@
 
   "koval.parameter.mining.speed": "Mining speed",
   "koval.parameter.mining.level": "Mining level",
-  "koval.parameter.mining.effective_blocks": "Mining blocks",
+  "koval.parameter.mining.effective_blocks": "Mining",
   "koval.parameter.attack.damage": "Attack damage",
   "koval.parameter.attack.speed": "Attack speed",
   "koval.parameter.base.durability": "Durability",
+  "koval.parameter.base.fragile": "Fragile",
+  "koval.parameter.base.repair_material": "Repair",
+
+  "koval.parameter.base.fragile.true": "Yes",
+  "koval.parameter.base.fragile.false": "No",
+
 
   "koval.parameter.mining.level.0": "Wood",
   "koval.parameter.mining.level.1": "Stone",
@@ -71,8 +77,10 @@
   "koval.function.boolean.or": "%s or %s",
   "koval.function.boolean.xor": "%s xor %s",
   "koval.function.boolean.not": "Not %s",
-  "koval.function.block.is_in": "%s",
-  "koval.function.item.is_in": "%s",
+  "koval.function.block.is_in": "%s %s",
+  "koval.function.item.is_in": "%s %s",
+  "koval.function.action.target_block": "Target block",
+  "koval.function.action.target_item": "Target item",
   "koval.function.unknown": "Unknown function",
 
   "container.assemble_table": "Assemble Table",

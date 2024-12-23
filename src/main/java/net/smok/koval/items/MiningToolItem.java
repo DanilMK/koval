@@ -131,4 +131,12 @@ public class MiningToolItem extends net.minecraft.item.MiningToolItem implements
     public int getItemBarStep(ItemStack stack) {
         return Math.round(13.0F - (float) stack.getDamage() * 13.0F / (float) stack.getMaxDamage());
     }
+
+    @Override
+    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+        KovalStack kovalStack = (KovalStack) (Object) stack;
+        if (kovalStack == null) return false;
+        Assembly assembly = kovalStack.getAssembly();
+        return assembly.applyValue(Values.Parameters.REPAIR_MATERIAL, false, ActionContext.builder().targetItem(ingredient).build());
+    }
 }

@@ -5,7 +5,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RepairItemRecipe;
 import net.minecraft.world.World;
 import net.smok.koval.items.KovalItem;
-import net.smok.koval.items.KovalStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,8 +16,6 @@ public class RepairRecipeMixin {
 
     @Inject(method = "matches(Lnet/minecraft/inventory/CraftingInventory;Lnet/minecraft/world/World;)Z", at = @At("HEAD"), cancellable = true)
     private void match(CraftingInventory craftingInventory, World world, CallbackInfoReturnable<Boolean> cir) {
-        KovalStack kovalStack = null;
-
 
         for (int i = 0; i < craftingInventory.size(); i++) {
             ItemStack itemStack = craftingInventory.getStack(i);
